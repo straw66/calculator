@@ -638,8 +638,6 @@ class calculator:
             out_numbers.config(yscrollcommand=scrollbar.set)
 
 
-
-
         self.string.set(content)
 
 calculator()
