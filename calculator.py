@@ -616,10 +616,12 @@ class calculator:
                 try:
                     number = int(get_number.get())
                     my_list = [f'{i}\n' for i in range(1, int(number) + 1)]
-                    for i in range(1, number + 1):
-                        x = random.randint(1, len(my_list)) - 1
-                        content += my_list[x] + "\n"
-
+                    print(my_list)
+                    content_no = [i for i in range(len(my_list))]
+                    random.shuffle(content_no)
+                    print(content_no)
+                    for i in content_no:
+                        content += my_list[i]
                     # 清空 Text 控件内容
                     out_numbers.delete(1.0, tk.END)
                     # 在 Text 控件中插入新内容
