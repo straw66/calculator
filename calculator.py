@@ -48,8 +48,8 @@ class calculator:
         m.add_cascade(label="Help", menu=helpmenu)
         self.list = ['π', 'e' , 'asin', '**', "√", "随机数"]
         list_explain = [" π:圆周率π的近似值", "e:自然对数e的近似值",
-                        """asin,acos,atan,分别代表反三角函数：
-        arcsin,arccos,arctan""", "÷:表示除号", "×:表示乘号,**：表示乘方",
+                        """asin,acos,atan,分别代表反三角函数：arcsin,arccos,arctan""",
+                        "**:表示乘方 ",
                         "√:表示开方", "随机数：random.randint(x,y),将生成一个在区间[x,y]之间的随机整数"]
         index = 0
         self.help_dict = {}
@@ -64,7 +64,7 @@ class calculator:
         changemenu.add_separator()
         changemenu.add_command(label="三维向量", command=lambda: self.callback("三维向量"))
         changemenu.add_separator()
-        changemenu.add_command(label="信息1802抽签", command=lambda: self.callback("信息1802抽签"))
+        changemenu.add_command(label="抽签", command=lambda: self.callback("抽签"))
 
 
 
@@ -421,20 +421,19 @@ class calculator:
         # 如果参数为Clear,清空文本框，如果参数为Del,去除最后一个字符
 
         if btn == "帮助":
-            tkinter.messagebox.showinfo("帮助", """     pi:圆周率π的近似值
+            tkinter.messagebox.showinfo("帮助",
+        """
+        pi:圆周率π的近似值
         e:自然对数e的近似值
-        tau:数学常数τ的近似值
         asin,acos,atan,分别代表反三角函数：
             arcsin,arccos,arctan
-        /:表示除号
-        //:表示整除
-        *:表示乘号
         **：表示乘方
-        Sqrt:表示开方
-        Clear:表示清空数据
-        del：表示退格，相当于电脑上的Backsace键
+        √:表示开方
+        AC:表示清空数据
+        Del：表示退格，相当于电脑上的Backsace键
         随机数：random.randint(x,y),将生成一个在区间[x,y]之间的随机整数
-        其他问题以及改进意见，请加QQ：273983336""")
+        其他问题以及改进意见，请加QQ：273983336
+        """)
         elif btn == "历史":
             try:
                 pdw = os.getcwd()
@@ -599,43 +598,43 @@ class calculator:
                 tk.Entry(window_vector, textvariable=out_pow).place(x=100, y=350)
                 out_pow.set(V1 ** V2)
 
-        elif btn == "信息1802抽签":
+        elif btn == "抽签":
+
             window_select = tk.Toplevel(self.window)
             window_select.geometry("350x400")
-            window_select.title("信息1802抽签")
+            window_select.title("抽签")
 
             get_number = tk.StringVar()
             tk.Label(window_select, text="请输入人数:0~32").place(x=10, y=10)
             tk.Entry(window_select, textvariable=get_number).place(x=100, y=40)
-            lists = ['1\n', '2\n', '3\n', '4\n', '5\n', '6\n', '7\n', '8\n', '9\n', '10\n', '11\n', '12\n', '13\n',
-                     '14\n', '15\n', '16\n', '17\n', '18\n', '19\n', '20\n', '21\n', '22\n', '23\n', '24\n', '25\n',
-                     '26\n', '27\n', '28\n', '29\n', '30\n', '31\n', '32\n']
 
 
-            def what_number():
-                content = ''
-                number = int(get_number.get())
-                if number < 0 or number > 32:
-                    content = "输入错误！"
-                else:
-                    for i in range(1, number + 1):
-                        x = random.randint(1, len(lists)) - 1
-                        content += lists[x] + "\n"
-
-                # 清空 Text 控件内容
-                out_numbers.delete(1.0, tk.END)
-                # 在 Text 控件中插入新内容
-                out_numbers.insert(tk.END, content)
-
-            btn_number = tk.Button(window_select, text="抽取", command=what_number, height=2)
+            btn_number = tk.Button(window_select, text="抽取", command=lambda: what_number(), height=2)
             btn_number.place(x=10, y=120, height=30, width=50)
+            def what_number():
 
+                content = ''
+                try:
+                    number = int(get_number.get())
+                    my_list = [f'{i}\n' for i in range(1, int(number) + 1)]
+                    for i in range(1, number + 1):
+                        x = random.randint(1, len(my_list)) - 1
+                        content += my_list[x] + "\n"
+
+                    # 清空 Text 控件内容
+                    out_numbers.delete(1.0, tk.END)
+                    # 在 Text 控件中插入新内容
+                    out_numbers.insert(tk.END, content)
+                except:
+                    tkinter.messagebox.showerror("错误", "输入错误")
             # 创建一个带有滚动条的 Text 控件
             out_numbers = Text(window_select, wrap=tk.WORD, height=10, width=30)
             out_numbers.place(x=10, y=160)
             scrollbar = Scrollbar(window_select, command=out_numbers.yview)
             scrollbar.place(x=285, y=160, height=180)
             out_numbers.config(yscrollcommand=scrollbar.set)
+
+
 
 
         self.string.set(content)
