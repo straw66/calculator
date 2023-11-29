@@ -432,7 +432,6 @@ class calculator:
         AC:表示清空数据
         Del：表示退格，相当于电脑上的Backsace键
         随机数：random.randint(x,y),将生成一个在区间[x,y]之间的随机整数
-        其他问题以及改进意见，请加QQ：273983336
         """)
         elif btn == "历史":
             try:
