@@ -12,6 +12,7 @@ import tkinter.messagebox
 import random
 
 
+
 class calculator:
     def __init__(self):
         self.window = tk.Tk()
@@ -24,7 +25,8 @@ class calculator:
         self.string = StringVar()
         label = ttk.Label(self.window, textvariable=self.string, font=('Arial', 18) ,anchor=('e'))
         label.grid(row=0,pady=10,columnspan=5,sticky='e',ipady=20)
-
+        ###标志位
+        self.flag_1 = 0
 
         ###################最顶端
         m = tkinter.Menu(self.window)
@@ -148,7 +150,7 @@ class calculator:
             if (txt == '='):
 
                 btn = Button(self.window,text=txt,
-                             command=lambda txt=txt: self.equals(),width=5,bootstyle="warning-TButton")
+                             command=lambda txt=txt: self.equals(self.string.get()),width=5,bootstyle="warning-TButton")
                 btn.grid(column= col, row= row , padx=10, pady=10,ipady=8)                # btn.grid(row=row, column=col, padx=5, pady=5)
 
 
@@ -234,7 +236,7 @@ class calculator:
             if (txt == '='):
 
                 btn = Button(self.window,text=txt,
-                             command=lambda txt=txt: self.equals(),width=7,bootstyle="warning-TButton")
+                             command=lambda txt=txt: self.equals(self.string.get()),width=7,bootstyle="warning-TButton")
                 btn.grid(column= col, row= row , padx=10, pady=10,ipady=20)                # btn.grid(row=row, column=col, padx=5, pady=5)
 
 
@@ -317,7 +319,11 @@ class calculator:
     def clearall(self):
         self.string.set("")
 
-    def equals(self):
+    def equals(self,new_string):
+        # if not isinstance(new_string, tk.StringVar):
+        #     # 如果不是，将其转换为对应格式
+        #     new_string = tk.StringVar(value=new_string)
+        print(new_string)
         result = ""
         flag = 0
         # 读取文件位置
@@ -325,10 +331,10 @@ class calculator:
         outfile = open(pdw + "\\history.txt", "a")
         outfile.write(self.string.get())
         #获取字符串，与正则匹配数字
-        new_string = self.string.get()
-        match = re.search(r'(\d+)!', new_string)
-        match_2 = re.search(r'ln\((\d+)\)', new_string)
-
+        pattern_1 = re.compile(r'!')
+        matches = pattern_1.findall(new_string)
+        pattern_2 = re.compile(r'ln\((.*?)\)')
+        matches_2 = pattern_2.findall(new_string)
 
         if "×" in new_string:
             new_string = new_string.replace("×", "*")
@@ -337,44 +343,46 @@ class calculator:
         if "√" in new_string:
             new_string = new_string.replace("√","sqrt")
         if "!" in new_string:
-            print(new_string)
-            number = match.group(1)
-            new_string = new_string.replace(match.group(), f'self.stage_by({number})')
+            for match in matches:
+                match_ = re.search(r'(\d+)!', new_string)
+                if match_:
+                    number = match_.group(1)
+                    new_string = new_string.replace(match_.group(), f'self.stage_by({number})')
+                else:
+                    match_ = re.search(r'\(([^)]*?)\)!',new_string)
+
+                    number_=str(round(float(self.equals(match_.group(1)))))
+                    new_string = new_string.replace('('+match_.group(1)+')',number_)
+                    match = re.search(r'(\d+)!', new_string)
+                    number = match.group(1)
+                    new_string = new_string.replace(match.group(), f'self.stage_by({number})')
+
         if "lg" in new_string:
             new_string = new_string.replace("lg","log10")
         if "ln" in new_string:
-            print(new_string)
-            number = match_2.group(1)
-            new_string = new_string.replace(match_2.group(),f"log({number},e)")
+            for match_2 in matches_2:
+                match_ = re.search(r'ln\((.*?)\)',new_string)
+                new_string = new_string.replace(match_.group(),f"log({match_.group(1)},e)")
         if "π" in new_string:
             new_string = new_string.replace("π", "pi")
             print(new_string)
         if self.mode_2==-1:
             if "asin" in new_string or "acos" in new_string or "atan" in new_string:
-                match_6 = re.search(r'(asin|acos|atan)\((\d+(\.\d+)?)\)', self.string.get())
-                number = match_6.group(0)
-                new_string = new_string.replace(match_6.group(),f'degrees({number})')
-                flag = 1
+                pattern_6 = re.compile(r'(asin|acos|atan)\(([^)]*?)\)')
+                matches_6 = pattern_6.findall(new_string)
+                for match_6 in matches_6:
+                    number = match_6[0]+'('+match_6[1]+')'
+                    new_string = new_string.replace( match_6[0]+'('+match_6[1]+')',f'degrees({number})')
+
+                    flag = 1
         else:
             if self.mode_1=='deg':
                 if "sin" in new_string:
-                    match_3_int = re.search(r'sin\((\d+)(\.\d+)°\)', new_string)
-                    match_3_f= re.search(r'sin\(\d+(\.\d+)°\)', new_string)
-                    number = match_3_int.group(1)+match_3_f.group(1)
-                    print(number)
-                    new_string = new_string.replace(new_string, f"sin({radians(float(number))})")
+                    pattern = re.compile(r'(sin|cos|tan)\(([^)]*?)\)')
+                    match_3 = pattern.findall(new_string)
+                    for match in match_3:
 
-                if "cos" in new_string:
-                    match_4_int = re.search(r'sin\((\d+)(\.\d+)°\)', new_string)
-                    match_4_f = re.search(r'sin\(\d+(\.\d+)°\)', new_string)
-                    number = match_4_int.group(1) + match_4_f.group(1)
-                    new_string = new_string.replace(new_string, f"sin({radians(float(number))})")
-
-                if "tan" in new_string:
-                    match_5_int = re.search(r'sin\((\d+)(\.\d+)°\)', new_string)
-                    match_5_f = re.search(r'sin\(\d+(\.\d+)°\)', new_string)
-                    number = match_5_int.group(1) + match_5_f.group(1)
-                    new_string = new_string.replace(new_string, f"sin({radians(float(number))})")
+                        new_string = new_string.replace(match[0]+'('+match[1]+')', f"sin({radians(float(match[1][0:-1]))})")
 
         try:
             result = str(eval(new_string))
@@ -382,6 +390,7 @@ class calculator:
             if flag == 1:
                 result = result+'°'
             self.string.set(result)
+            return result
         except:
             result = "INVALID INPUT"
         self.string.set(result)
@@ -389,11 +398,16 @@ class calculator:
         outfile.write("=" + str(result) + "\n")
         outfile.close()
 
+
     def addChar(self, char):
+
+        if char == 'sin(' or char == 'cos(' or char == 'tan(':
+            self.flag_1 = 1
+        if char == ")":
+            self.flag_1 = 0
         if self.mode_1=='deg' and len(self.string.get()) and self.mode_2!=-1:
-            match = re.search(r'(sin|cos|tan)\((\d*\.?\d+)\)', self.string.get())
-            print(match.group())
-            if char in ('0','1','2','3','4','5','6','7','8','9') and match and self.string.get()[-1]!='°':
+            print(char)
+            if char in ('0','1','2','3','4','5','6','7','8','9')  and self.string.get()[-1]!='°' and self.flag_1:
                 self.string.set(self.string.get() + (str(char))+'°')
 
             elif self.string.get()[-1]=='°' and char in ('0','1','2','3','4','5','6','7','8','9'):
