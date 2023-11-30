@@ -10,9 +10,8 @@ from math import pi, e, sin, cos, tan, log, log10, ceil, degrees, radians, exp, 
 import os
 import tkinter.messagebox
 import random
-
-
-
+from cal24pygui import point_24
+################################################################################################################
 class calculator:
     def __init__(self):
         self.window = tk.Tk()
@@ -67,8 +66,11 @@ class calculator:
         changemenu.add_command(label="三维向量", command=lambda: self.callback("三维向量"))
         changemenu.add_separator()
         changemenu.add_command(label="抽签", command=lambda: self.callback("抽签"))
-
-
+        #设置更多选项
+        moremenu = tkinter.Menu(m)
+        m.add_cascade(label="更多", menu=moremenu)
+        moremenu.add_command(label='24点小游戏',command=lambda: point_24())
+        moremenu.add_separator()
 
 
         self.value_1 = [" ","rad","sin","cos","tan",
@@ -655,3 +657,4 @@ class calculator:
         self.string.set(content)
 
 calculator()
+###########################################################################################################
